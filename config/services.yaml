@@ -372,6 +372,31 @@ services:
         arguments:
             $drivers: !tagged_iterator app.address_book_driver
 
+    App\Service\ImportantMail\RuleClassifier:
+        arguments:
+            $govDomains: '%important_mail.gov_domains%'
+            $govSenderWords: '%important_mail.gov_sender_words%'
+            $billWords: '%important_mail.bill_words%'
+            $billSenderWords: '%important_mail.bill_sender_words%'
+
+    App\Service\ImportantMail\FamilyResolver:
+        arguments:
+            $familyTags: '%important_mail.family_tags%'
+
+    App\Service\ImportantMail\NotifyWindow:
+        arguments:
+            $timezone: '%env(IMPORTANT_MAIL_TZ)%'
+
+    App\Service\ImportantMail\TelegramNotifier:
+        arguments:
+            $envFile: '%env(TELEGRAM_ENV_FILE)%'
+
+    App\Service\ImportantMail\ModelClassifier:
+        arguments:
+            $baseUrl: '%env(IMPORTANT_MAIL_BASE_URL)%'
+            $model: '%env(IMPORTANT_MAIL_MODEL)%'
+            $apiKey: '%env(IMPORTANT_MAIL_API_KEY)%'
+
     _instanceof:
         App\Domain\Interface\AccountSyncerInterface:
             tags: ['app.account_syncer']
