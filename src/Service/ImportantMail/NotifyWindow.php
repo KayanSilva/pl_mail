@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\ImportantMail;
 
+use App\Domain\Interface\NotifyWindowInterface;
 use DateTimeImmutable;
 use DateTimeZone;
 
@@ -14,7 +15,7 @@ use DateTimeZone;
  * Messages received outside this window are recorded as pending and included
  * in the 06:00 morning digest.
  */
-final readonly class NotifyWindow
+final readonly class NotifyWindow implements NotifyWindowInterface
 {
     private DateTimeZone $tz;
 

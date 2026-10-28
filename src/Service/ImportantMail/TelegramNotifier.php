@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\ImportantMail;
 
 use App\Domain\Enum\Mail\ImportanceKind;
+use App\Domain\Interface\TelegramNotifierInterface;
 use App\Entity\Mail\Message;
 use RuntimeException;
 use Symfony\Component\Dotenv\Dotenv;
@@ -16,7 +17,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * Never logs or exposes the bot token in error messages or logs.
  */
-final readonly class TelegramNotifier
+final readonly class TelegramNotifier implements TelegramNotifierInterface
 {
     public function __construct(
         private HttpClientInterface $http,

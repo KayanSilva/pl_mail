@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\ImportantMail;
 
 use App\Domain\Enum\Mail\ImportanceKind;
+use App\Domain\Interface\ModelClassifierInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -18,7 +19,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * contains "free" (case-insensitive) or matches generic auto/combo aliases, the
  * classifier disables itself and leaves the message unclassified.
  */
-final readonly class ModelClassifier
+final readonly class ModelClassifier implements ModelClassifierInterface
 {
     private const int MAX_BODY_CHARS = 1500;
     private const array FORBIDDEN_MODEL_SUBSTRINGS = ['free', 'auto', 'combo'];

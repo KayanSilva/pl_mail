@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\ImportantMail;
 
+use App\Domain\Interface\FamilyResolverInterface;
 use App\Entity\Contacts\Contact;
 use App\Entity\Contacts\ContactEmail;
 use App\Entity\User\User;
@@ -16,7 +17,7 @@ use App\Repository\Contacts\ContactRepository;
  * A contact must be tagged with one of the configured names (case-insensitive)
  * and have at least one email address to contribute to the family list.
  */
-final readonly class FamilyResolver
+final readonly class FamilyResolver implements FamilyResolverInterface
 {
     /** @var list<string> normalized (lowercase) tag names */
     private array $normalizedTags;
