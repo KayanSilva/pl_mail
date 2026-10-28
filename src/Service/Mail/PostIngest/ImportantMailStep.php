@@ -50,9 +50,9 @@ final readonly class ImportantMailStep implements PostIngestStepInterface
         private FamilyResolverInterface $family,
         private ModelClassifierInterface $model,
         private ImportantMailRepository $importantMailRepo,
-        private TelegramNotifierInterface $notifier,
-        private NotifyWindowInterface $window,
         private EntityManagerInterface $em,
+        private ?TelegramNotifierInterface $notifier = null,
+        private ?NotifyWindowInterface $window = null,
         ?LoggerInterface $logger = null,
         #[Autowire('%env(default::IMPORTANT_MAIL_SINCE)%')]
         string|DateTimeImmutable|null $since = null,
@@ -129,8 +129,8 @@ final readonly class ImportantMailStep implements PostIngestStepInterface
                     classifiedAt: $now,
                 );
 
-                // Immediate notification window: 06h to 20h
-                if ($this->window->isOpen($now)) {
+                // Immediate notification window: only if notifier and window are configured
+                if (null !== $this->notifier && null !== $this->window && $this->window->isOpen($now)) {
                     try {
                         $text = TelegramNotifier::format($message, $kind);
                         $this->notifier->send($text);

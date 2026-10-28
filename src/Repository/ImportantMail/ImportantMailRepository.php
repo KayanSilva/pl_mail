@@ -68,4 +68,35 @@ class ImportantMailRepository extends ServiceEntityRepository
 
         return $unresolved;
     }
+
+    /**
+     * Important messages that have not been notified yet (notifiedAt IS NULL)
+     * and are still active in Inbox and unseen.
+     *
+     * @return list<ImportantMail>
+     */
+    public function findUnnotifiedFor(User $user): array
+    {
+        /** @var list<ImportantMail> $all */
+        $all = $this->createQueryBuilder('im')
+            ->join('im.message', 'm')
+            ->join('m.account', 'a')
+            ->where('a.usr = :user')
+            ->andWhere('im.notifiedAt IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('im.classifiedAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $unnotified = [];
+        foreach ($all as $item) {
+            $msg = $item->message;
+            if ($msg->isSetAside() || null !== $msg->seenAt || !$msg->isInInbox()) {
+                continue;
+            }
+            $unnotified[] = $item;
+        }
+
+        return $unnotified;
+    }
 }

@@ -131,6 +131,26 @@ final class ImportantMailStepTest extends TestCase
         self::assertNull($persisted->notifiedAt);
     }
 
+    public function testPersistsRowWithoutNotifierLeavingItForChiefOrchestrator(): void
+    {
+        $msg = $this->createMessage('notifica@receita.fazenda.gov.br', '2026-10-28 10:00:00');
+
+        $persisted = null;
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())->method('persist')->willReturnCallback(function ($entity) use (&$persisted) {
+            $persisted = $entity;
+        });
+        $em->expects(self::once())->method('flush');
+
+        // Notifier and window null
+        $step = $this->buildStep(em: $em, notifier: null, window: null);
+        $step->afterCommit(new PostIngestResult([$msg], [$this->account], [], live: true));
+
+        self::assertInstanceOf(ImportantMail::class, $persisted);
+        self::assertSame(ImportanceKind::Government, $persisted->kind);
+        self::assertNull($persisted->notifiedAt);
+    }
+
     public function testSecondRunDoesNotDuplicateRow(): void
     {
         $msg = $this->createMessage('notifica@receita.fazenda.gov.br', '2026-10-28 10:00:00');
@@ -202,9 +222,9 @@ final class ImportantMailStepTest extends TestCase
             family: $family,
             model: $model,
             importantMailRepo: $repo,
+            em: $em,
             notifier: $notifier,
             window: $window,
-            em: $em,
             logger: new NullLogger(),
             since: $since,
         );
