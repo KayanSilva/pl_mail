@@ -1,0 +1,43 @@
+parameters:
+    important_mail.gov_domains:
+        - gov.br
+        - jus.br
+        - leg.br
+        - mp.br
+    important_mail.gov_sender_words:
+        - receita
+        - inss
+        - detran
+        - prefeitura
+        - tribunal
+    important_mail.bill_words:
+        - boleto
+        - fatura
+        - vencimento
+        - 2ª via
+        - segunda via
+        - cobrança
+    important_mail.bill_sender_words:
+        - nubank
+        - itau
+        - bradesco
+        - santander
+        - inter
+        - caixa
+        - enel
+        - sabesp
+        - vivo
+        - claro
+        - tim
+        - condom
+    important_mail.family_tags:
+        - Family
+        - Família
+        - Familia
+    important_mail.timezone: '%env(default::IMPORTANT_MAIL_TZ)%'
+    env(IMPORTANT_MAIL_TZ): 'America/Sao_Paulo'
+    env(IMPORTANT_MAIL_SINCE): ''
+    env(IMPORTANT_MAIL_BASE_URL): 'http://host.docker.internal:20128'
+    env(IMPORTANT_MAIL_MODEL): ''
+    env(IMPORTANT_MAIL_API_KEY): 'none'
+    env(TELEGRAM_ENV_FILE): '/run/hermes.env'
