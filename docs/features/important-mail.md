@@ -50,6 +50,41 @@ Outputs a single line of JSON to stdout:
 A message remains pending until it is both **seen** (`seenAt !== null`) and **archived** (out of
 the Inbox). Trashed or spammed messages are excluded.
 
+## Unnotified Messages (`app:important:unnotified`)
+
+Used by external orchestrators (such as Chief in `my-one-person-business`) to fetch candidate messages that have not yet triggered an alert:
+```bash
+php bin/console app:important:unnotified [--mark-notified]
+```
+
+Outputs a single line of JSON to stdout:
+```json
+{
+  "count": 1,
+  "items": [
+    {
+      "id": 42,
+      "kind": "government",
+      "from": "notifica@receita.fazenda.gov.br",
+      "subject": "Intimação Fiscal",
+      "received_at": "2026-10-28T14:15:00-03:00",
+      "amount": null,
+      "due": null
+    }
+  ]
+}
+```
+When `--mark-notified` is provided, `notifiedAt` is stamped on the matched `important_mail` records so they will not be re-emitted in future runs.
+
+## Architecture & Chief Orchestration
+
+`pl_mail` is strictly the centralizer for email accounts and calendar. It ingests, syncs, classifies importance (via rules, family resolver, or model fallback), and persists `important_mail` records.
+
+The orchestrator connecting `pl_mail` to Telegram is **Chief** (`my-one-person-business`):
+1. **Periodic Monitor:** Chief executes `chief.py monitorar-emails` during daytime (06:00 to 20:00). It calls `app:important:unnotified --mark-notified` inside the container and immediately dispatches alerts to Telegram.
+2. **Overnight Repose:** Between 20:00 and 06:00, Chief holds notifications, allowing night emails to accumulate safely for the morning.
+3. **06:00 Morning Briefing:** Chief calls `app:important:digest` to compile all unresolved items into the daily executive briefing.
+
 ## Configuration & Environment Variables
 
 | Variable | Default | Purpose |
