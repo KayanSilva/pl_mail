@@ -27,13 +27,11 @@ use Psr\Log\NullLogger;
 
 final class ImportantMailStepTest extends TestCase
 {
-    private DateTimeImmutable $since;
     private User $user;
     private Account $account;
 
     protected function setUp(): void
     {
-        $this->since   = new DateTimeImmutable('2026-10-28 00:00:00');
         $this->user    = new User();
         $this->account = new Account();
         $this->account->usr   = $this->user;

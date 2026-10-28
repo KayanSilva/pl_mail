@@ -1,0 +1,46 @@
+# compose.local.yaml
+# Local deployment configuration for plMail with Important Mail, Telegram & OmniRoute relay.
+
+services:
+  secrets-init:
+    build:
+      context: .
+      target: frankenphp_prod
+
+  php:
+    build:
+      context: .
+      target: frankenphp_prod
+    volumes:
+      - /home/kayan/.hermes/.env:/run/hermes.env:ro
+    environment:
+      IMPORTANT_MAIL_TZ: ${IMPORTANT_MAIL_TZ:-America/Sao_Paulo}
+      IMPORTANT_MAIL_SINCE: ${IMPORTANT_MAIL_SINCE:-}
+      IMPORTANT_MAIL_BASE_URL: ${IMPORTANT_MAIL_BASE_URL:-http://host.docker.internal:20129}
+      IMPORTANT_MAIL_MODEL: ${IMPORTANT_MAIL_MODEL:-}
+      IMPORTANT_MAIL_API_KEY: ${IMPORTANT_MAIL_API_KEY:-none}
+      TELEGRAM_ENV_FILE: /run/hermes.env
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  worker:
+    build:
+      context: .
+      target: frankenphp_prod
+    volumes:
+      - /home/kayan/.hermes/.env:/run/hermes.env:ro
+    environment:
+      IMPORTANT_MAIL_TZ: ${IMPORTANT_MAIL_TZ:-America/Sao_Paulo}
+      IMPORTANT_MAIL_SINCE: ${IMPORTANT_MAIL_SINCE:-}
+      IMPORTANT_MAIL_BASE_URL: ${IMPORTANT_MAIL_BASE_URL:-http://host.docker.internal:20129}
+      IMPORTANT_MAIL_MODEL: ${IMPORTANT_MAIL_MODEL:-}
+      IMPORTANT_MAIL_API_KEY: ${IMPORTANT_MAIL_API_KEY:-none}
+      TELEGRAM_ENV_FILE: /run/hermes.env
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  omniroute-relay:
+    image: alpine/socat
+    restart: unless-stopped
+    network_mode: host
+    command: ["tcp-listen:20129,bind=172.17.0.1,fork,reuseaddr", "tcp:127.0.0.1:20128"]
