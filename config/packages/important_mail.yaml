@@ -34,10 +34,40 @@ parameters:
         - Family
         - Família
         - Familia
-    important_mail.timezone: '%env(default::IMPORTANT_MAIL_TZ)%'
+
     env(IMPORTANT_MAIL_TZ): 'America/Sao_Paulo'
     env(IMPORTANT_MAIL_SINCE): ''
     env(IMPORTANT_MAIL_BASE_URL): 'http://host.docker.internal:20128'
     env(IMPORTANT_MAIL_MODEL): ''
     env(IMPORTANT_MAIL_API_KEY): 'none'
     env(TELEGRAM_ENV_FILE): '/run/hermes.env'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Service\ImportantMail\RuleClassifier:
+        arguments:
+            $govDomains: '%important_mail.gov_domains%'
+            $govSenderWords: '%important_mail.gov_sender_words%'
+            $billWords: '%important_mail.bill_words%'
+            $billSenderWords: '%important_mail.bill_sender_words%'
+
+    App\Service\ImportantMail\FamilyResolver:
+        arguments:
+            $familyTags: '%important_mail.family_tags%'
+
+    App\Service\ImportantMail\NotifyWindow:
+        arguments:
+            $timezone: '%env(IMPORTANT_MAIL_TZ)%'
+
+    App\Service\ImportantMail\TelegramNotifier:
+        arguments:
+            $envFile: '%env(TELEGRAM_ENV_FILE)%'
+
+    App\Service\ImportantMail\ModelClassifier:
+        arguments:
+            $baseUrl: '%env(IMPORTANT_MAIL_BASE_URL)%'
+            $model: '%env(IMPORTANT_MAIL_MODEL)%'
+            $apiKey: '%env(IMPORTANT_MAIL_API_KEY)%'
